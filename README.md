@@ -43,6 +43,59 @@ npm install
 npm run dev
 ```
 
+### Run on system boot (MacOS)
+- Requires NPM Homebrew (https://formulae.brew.sh/formula/node)
+- Update USERNAME
+- Update path to Jumble
+
+```bash
+sudo nano ~/Library/LaunchAgents/com.USERNAME.jumble.plist
+```
+
+```bash
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN"
+ "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.jumble.dev</string>
+
+  <!-- run a short shell command (non-login) that sets PATH and execs node/npm -->
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/sh</string>
+    <string>-c</string>
+    <string>cd "$HOME/jumble" \
+      && export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin" \
+      && if [ -f /opt/homebrew/lib/node_modules/npm/bin/npm-cli.js ]; then \
+           exec /opt/homebrew/bin/node /opt/homebrew/lib/node_modules/npm/bin/npm-cli.js run dev; \
+         else \
+           exec /opt/homebrew/bin/npm run dev; \
+         fi
+    </string>
+  </array>
+
+  <!-- keep it alive and log output -->
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>/tmp/jumbledev.log</string>
+  <key>StandardErrorPath</key>
+  <string>/tmp/jumbledev.err</string>
+</dict>
+</plist>
+
+```
+```bash
+launchctl load ~/Library/LaunchAgents/com.USERNAME.jumble.plist
+
+```
+
+
+
 ## Run Docker
 
 ```bash
